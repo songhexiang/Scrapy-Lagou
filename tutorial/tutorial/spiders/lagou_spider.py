@@ -5,6 +5,7 @@ from scrapy.linkextractors import LinkExtractor
 from scrapy.selector import Selector
 from scrapy.http import Request, FormRequest
 from tutorial.items import TutorialItem
+import hashlib
 import re
 import time
 import io
@@ -38,6 +39,14 @@ class LagouSpider(CrawlSpider):
         #'X-Anit-Forge-Code': '99573313',
         'Upgrade-Insecure-Requests': '1'
     }
+
+    def encryptPwd(passwd):
+        # 对密码进行了md5双重加密
+        passwd = hashlib.md5(passwd.encode('utf-8')).hexdigest()
+        # veennike 这个值是在js文件找到的一个写死的值
+        passwd = 'veenike'+passwd+'veenike'
+        passwd = hashlib.md5(passwd.encode('utf-8')).hexdigest()
+        return passwd
     
     # 重写爬虫类的方法，定义了自定义请求
     def start_requests(self):
@@ -64,10 +73,10 @@ class LagouSpider(CrawlSpider):
                             formdata = {
                             'isValidate' : 'true',
                             #此处待更改，拉勾网采用了双重md5加密算法
-                            'password' : '8e65949be8bdd54dc895bf9bad5f47a5',
+                            'password' : encryptPwd("please input your password"), #'8e65949be8bdd54dc895bf9bad5f47a5',
                             'request_form_verifyCode' : '',
                             'submit' : '',
-                            'username' : '15929939451'
+                            'username' : 'please input your username'
                             },
                             callback = self.after_login,
                             dont_filter = True
